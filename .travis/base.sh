@@ -36,17 +36,13 @@ if [ ! -f ${DIR}/build.cfg ]; then
 
     echo "ABORT_BUILD=false" > ${DIR}/build.cfg
     echo "ABORT_CODE=0" >> ${DIR}/build.cfg
-    ## regexp to match the various versions required
-    V16_REGEXP='v0\.16\.([0-9]+|x)'
-    V19_REGEXP='v0\.19\.([0-9]+|x)'
 
-    ## determine the build type here
-    if [[ "${TRAVIS_BRANCH}" =~ ${V16_REGEXP} ]]; then
-        BUILD_FOCUS='v0.16'
-    elif [[ "${TRAVIS_BRANCH}" =~ ${V19_REGEXP} ]]; then
-        BUILD_FOCUS='v0.19'
+    VALID_BRANCH_REGEXP='^v([0-9]+\.){2}([0-9]+|x)'
+    if [[ "${TRAVIS_BRANCH}" =~ ${VALID_BRANCH_REGEXP} ]]; then
+        # Use first two digits of branch, e.g. v0.20
+        BUILD_FOCUS="$(echo "${TRAVIS_BRANCH}" | cut -d . -f -2)"
     else
-        BUILD_FOCUS='latest'
+        BUILD_FOCUS=''
     fi
 
     if [ -z "${TRAVIS_TAG}" ]; then
